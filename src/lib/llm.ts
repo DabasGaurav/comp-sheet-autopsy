@@ -3,7 +3,42 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import type { Extraction } from "./types";
 
-export const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5-5";
+import { getVercelOidcToken } from "@vercel/oidc";
+
+// Two ways to reach Claude:
+//  1. ANTHROPIC_API_KEY set  -> Anthropic API directly
+//  2. otherwise on Vercel    -> Vercel AI Gateway (Anthropic Messages-compatible), authenticated by the
+//                               project's OIDC token, so no API key is stored anywhere.
+const DIRECT_MODELS = [process.env.ANTHROPIC_MODEL, "claude-sonnet-5-5", "claude-sonnet-4-5"].filter(Boolean) as string[];
+const GATEWAY_MODELS = [process.env.ANTHROPIC_MODEL, "anthropic/claude-sonnet-5.5", "anthropic/claude-sonnet-4.5", "anthropic/claude-haiku-4.5"].filter(Boolean) as string[];
+export let MODEL = DIRECT_MODELS[0];
+
+async function getClient(): Promise<{ client: Anthropic; models: string[] }> {
+  if (process.env.ANTHROPIC_API_KEY) return { client: new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }), models: DIRECT_MODELS };
+  let token = process.env.AI_GATEWAY_API_KEY;
+  if (!token) { try { token = await getVercelOidcToken(); } catch { token = undefined; } }
+  if (!token) throw new Error("NO_API_KEY");
+  return { client: new Anthropic({ apiKey: token, baseURL: "https://ai-gateway.vercel.sh" }), models: GATEWAY_MODELS };
+}
+
+/** Try each candidate model id; move on only when the model id itself is rejected. */
+async function create(params: Omit<Parameters<Anthropic["messages"]["create"]>[0], "model">) {
+  const { client, models } = await getClient();
+  let last: unknown;
+  for (const model of models) {
+    try {
+      const msg = (await client.messages.create({ ...params, model, stream: false } as Parameters<Anthropic["messages"]["create"]>[0])) as Anthropic.Message;
+      MODEL = model;
+      return msg;
+    } catch (e) {
+      last = e;
+      const status = (e as { status?: number }).status;
+      const text = String((e as Error).message ?? "");
+      if (!(status === 404 || (status === 400 && /model/i.test(text)))) throw e;
+    }
+  }
+  throw last;
+}
 
 const TierZ = z.object({ fromPct: z.number().min(0), toPct: z.number().nullable(), rate: z.number().min(0).max(1) });
 const SpiffZ = z.object({ label: z.string(), minDealAmount: z.number().min(0), amount: z.number().min(0) });
@@ -100,12 +135,8 @@ Rules:
 - You do not calculate any payouts. Ever.`;
 
 export async function extractPlan(planText: string, headers: Record<string, string[]>): Promise<Extraction> {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error("NO_API_KEY");
-  const client = new Anthropic({ apiKey: key });
   const t0 = Date.now();
-  const msg = await client.messages.create({
-    model: MODEL,
+  const msg = await create({
     max_tokens: 3000,
     system: SYSTEM_EXTRACT,
     tools: [EXTRACT_TOOL],
@@ -144,12 +175,8 @@ Constraints:
 - Sign off as "{{BDR first name}}".`;
 
 export async function draftOpener(input: OpenerInput) {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error("NO_API_KEY");
-  const client = new Anthropic({ apiKey: key });
   const t0 = Date.now();
-  const msg = await client.messages.create({
-    model: MODEL,
+  const msg = await create({
     max_tokens: 400,
     system: SYSTEM_OPENER,
     messages: [{ role: "user", content: `AUTOPSY FINDINGS (aggregated; no rep-level data):\n${JSON.stringify(input, null, 1)}` }],
