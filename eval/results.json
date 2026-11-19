@@ -1,0 +1,117 @@
+{
+  "ranAt": "2026-11-19T17:36:09.238Z",
+  "engine": "deterministic (no LLM)",
+  "planted": 12,
+  "recovered": 12,
+  "falseFlags": 0,
+  "identicalOnRerun": true,
+  "workbooks": [
+    {
+      "file": "Q3_Comp_FINAL_v7_USE_THIS.xlsx",
+      "payees": 8,
+      "plantedDefects": 8,
+      "recovered": 8,
+      "falseFlags": 0,
+      "overpaid": 61350,
+      "underpaid": 0,
+      "topAmbiguity": {
+        "clause": "An accelerated rate of 15% applies to bookings once a rep exceeds 100% of quota",
+        "dollarsAtStake": 52500
+      },
+      "flagged": [
+        {
+          "rep": "Avery Chen",
+          "variance": 7700,
+          "causes": [
+            "split_double_credit"
+          ]
+        },
+        {
+          "rep": "Priya Nair",
+          "variance": 15000,
+          "causes": [
+            "accelerator_mode"
+          ]
+        },
+        {
+          "rep": "Marcus Webb",
+          "variance": 11500,
+          "causes": [
+            "clawback_missed"
+          ]
+        },
+        {
+          "rep": "Hana Sato",
+          "variance": 6650,
+          "causes": [
+            "split_double_credit"
+          ]
+        },
+        {
+          "rep": "Leo Fischer",
+          "variance": 2500,
+          "causes": [
+            "hardcoded_override"
+          ]
+        },
+        {
+          "rep": "Sofia Marin",
+          "variance": 18000,
+          "causes": [
+            "cap_ignored"
+          ]
+        }
+      ]
+    },
+    {
+      "file": "Q3_Comp_clean_control.xlsx",
+      "payees": 8,
+      "plantedDefects": 0,
+      "recovered": 0,
+      "falseFlags": 0,
+      "overpaid": 0,
+      "underpaid": 0,
+      "topAmbiguity": {
+        "clause": "An accelerated rate of 15% applies to bookings once a rep exceeds 100% of quota",
+        "dollarsAtStake": 52500
+      },
+      "flagged": []
+    },
+    {
+      "file": "MidMarket_Q3_payouts_v3-copy.xlsx",
+      "payees": 5,
+      "plantedDefects": 4,
+      "recovered": 4,
+      "falseFlags": 0,
+      "overpaid": 4800,
+      "underpaid": 9800,
+      "topAmbiguity": {
+        "clause": "Deals cancelled within 60 days of close are clawed back.",
+        "dollarsAtStake": 4000
+      },
+      "flagged": [
+        {
+          "rep": "Nina Patel",
+          "variance": -8000,
+          "causes": [
+            "accelerator_mode"
+          ]
+        },
+        {
+          "rep": "Omar Haddad",
+          "variance": 4800,
+          "causes": [
+            "clawback_missed"
+          ]
+        },
+        {
+          "rep": "Ines Duarte",
+          "variance": -1800,
+          "causes": [
+            "hardcoded_override"
+          ]
+        }
+      ]
+    }
+  ]
+}

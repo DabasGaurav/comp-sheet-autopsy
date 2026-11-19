@@ -1,0 +1,55 @@
+{
+  "Q3_Comp_FINAL_v7_USE_THIS.xlsx": {
+    "defects": [
+      {
+        "rep": "Priya Nair",
+        "cause": "accelerator_mode"
+      },
+      {
+        "rep": "Marcus Webb",
+        "cause": "clawback_missed"
+      },
+      {
+        "rep": "Avery Chen",
+        "cause": "split_double_credit"
+      },
+      {
+        "rep": "Hana Sato",
+        "cause": "split_double_credit"
+      },
+      {
+        "rep": "Sofia Marin",
+        "cause": "cap_ignored"
+      },
+      {
+        "rep": "Leo Fischer",
+        "cause": "hardcoded_override"
+      }
+    ],
+    "errorCells": 1,
+    "hiddenSheets": 1
+  },
+  "Q3_Comp_clean_control.xlsx": {
+    "defects": [],
+    "errorCells": 0,
+    "hiddenSheets": 0
+  },
+  "MidMarket_Q3_payouts_v3-copy.xlsx": {
+    "defects": [
+      {
+        "rep": "Nina Patel",
+        "cause": "accelerator_mode"
+      },
+      {
+        "rep": "Omar Haddad",
+        "cause": "clawback_missed"
+      },
+      {
+        "rep": "Ines Duarte",
+        "cause": "hardcoded_override"
+      }
+    ],
+    "errorCells": 1,
+    "hiddenSheets": 0
+  }
+}
