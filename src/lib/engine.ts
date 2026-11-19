@@ -51,7 +51,7 @@ export function spiffsFor(deals: Deal[], rules: Rules): number {
   let total = 0;
   for (const d of deals) {
     if (isClawedBack(d, rules)) continue;
-    const share = rules.splitRule === "pro_rata" ? d.splitPct / 100 : 1;
+    const share = rules.spiffSplit === "full_each" ? 1 : d.splitPct / 100;
     for (const s of rules.spiffs) if (d.amount >= s.minDealAmount) total += s.amount * share;
   }
   return total;
@@ -75,7 +75,7 @@ function diagnosticVariants(rules: Rules): { cause: Cause; rules: Rules; note: s
   if (rules.clawbackDays != null)
     v.push({ cause: "clawback_missed", rules: { ...rules, clawbackDays: null }, note: `A deal that churned within ${rules.clawbackDays} days was not clawed back.` });
   if (rules.splitRule === "pro_rata")
-    v.push({ cause: "split_double_credit", rules: { ...rules, splitRule: "full_credit_each" }, note: "A split deal was credited at 100% to more than one rep." });
+    v.push({ cause: "split_double_credit", rules: { ...rules, splitRule: "full_credit_each", spiffSplit: "full_each" }, note: "A split deal was credited at 100% to more than one rep." });
   if (rules.capPct != null)
     v.push({ cause: "cap_ignored", rules: { ...rules, capPct: null }, note: `Bookings above the ${rules.capPct}% cap were still paid.` });
   if (rules.spiffs.length)

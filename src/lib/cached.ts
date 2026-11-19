@@ -16,6 +16,7 @@ export function cachedSampleExtraction(file: string): Extraction | null {
       clawbackDays: line(/claw|cancel/i),
       splitRule: line(/split|shared/i),
       spiffs: line(/SPIFF|bonus/i),
+      spiffSplit: null,
     },
     columnMap: COLUMN_MAP,
     ambiguities: s.ambiguities,

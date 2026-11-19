@@ -7,6 +7,7 @@ const PLAN: Rules = {
   tiers: [ { fromPct: 0, toPct: 100, rate: 0.1 }, { fromPct: 100, toPct: 150, rate: 0.15 }, { fromPct: 150, toPct: null, rate: 0.2 } ],
   acceleratorMode: "marginal", capPct: 200, clawbackDays: 90, splitRule: "pro_rata",
   spiffs: [{ label: "big deal", minDealAmount: 100000, amount: 1000 }],
+  spiffSplit: "pro_rata",
 };
 
 describe("tiered commission", () => {

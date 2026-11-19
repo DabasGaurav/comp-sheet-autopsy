@@ -46,6 +46,7 @@ const AE_TRUTH: Rules = {
   clawbackDays: 90,
   splitRule: "pro_rata",
   spiffs: [{ label: "Deal ≥ $100k", minDealAmount: 100000, amount: 1000 }],
+  spiffSplit: "pro_rata",
 };
 
 const AE_AMBIGUITIES: Ambiguity[] = [
@@ -63,8 +64,8 @@ const AE_AMBIGUITIES: Ambiguity[] = [
     clause: "Any deal with ACV of $100,000 or more earns an additional $1,000 bonus",
     issue: "On a split deal, does each rep get the full $1,000 or their split share of it?",
     readings: [
-      { label: "Split share of the bonus", patch: { splitRule: "pro_rata" } },
-      { label: "Full bonus to every rep on the deal", patch: { splitRule: "full_credit_each" } },
+      { label: "Split share of the bonus", patch: { spiffSplit: "pro_rata" } },
+      { label: "Full bonus to every rep on the deal", patch: { spiffSplit: "full_each" } },
     ],
   },
 ];
@@ -149,6 +150,7 @@ export const SAMPLES: SampleSpec[] = [
       clawbackDays: 60,
       splitRule: "pro_rata",
       spiffs: [],
+      spiffSplit: "pro_rata",
     },
     ambiguities: [
       {

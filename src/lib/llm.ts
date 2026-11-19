@@ -14,6 +14,7 @@ const RulesZ = z.object({
   clawbackDays: z.number().int().positive().nullable(),
   splitRule: z.enum(["pro_rata", "full_credit_each"]),
   spiffs: z.array(SpiffZ).max(5),
+  spiffSplit: z.enum(["pro_rata", "full_each"]),
 });
 const PatchZ = RulesZ.partial();
 export const ExtractionZ = z.object({
@@ -43,6 +44,7 @@ const rulesProps = {
   clawbackDays: { type: ["integer", "null"] },
   splitRule: { type: "string", enum: ["pro_rata", "full_credit_each"] },
   spiffs: { type: "array", items: spiffSchema },
+  spiffSplit: { type: "string", enum: ["pro_rata", "full_each"], description: "on split deals, is a SPIFF paid by split share or in full to each rep? use pro_rata if silent and flag an ambiguity if it matters" },
 };
 
 const EXTRACT_TOOL = {
@@ -92,6 +94,7 @@ Rules:
 - Rates are fractions (10% -> 0.10). Tier boundaries are attainment percentages of quota.
 - acceleratorMode: "retroactive" only if the text says the higher rate applies to ALL bookings / the whole quarter; otherwise use the most literal reading and, if a reasonable reader could disagree, record an ambiguity.
 - For every rule field, quote the exact source sentence (or null).
+- A reading's patch must change ONLY the rule field(s) that clause governs.
 - Ambiguities: only clauses where two reasonable readings would change what a rep is paid AND each reading can be expressed by changing rule fields. Give 2 readings as patches. Do not pick a winner. Max 3.
 - columnMap: choose from the exact header strings provided. Use null for optional columns that do not exist.
 - You do not calculate any payouts. Ever.`;

@@ -24,6 +24,8 @@ export type Rules = {
   /** pro_rata: split deals credit amount × split%. full_credit_each: every rep on the deal gets 100%. */
   splitRule: "pro_rata" | "full_credit_each";
   spiffs: Spiff[];
+  /** on split deals: SPIFF paid by split share, or in full to every rep on the deal */
+  spiffSplit: "pro_rata" | "full_each";
 };
 
 export type RuleField = keyof Rules;

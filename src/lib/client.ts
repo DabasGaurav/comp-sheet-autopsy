@@ -30,7 +30,7 @@ export function track(type: string, props: Record<string, unknown> = {}) {
   } catch {}
 }
 
-export const usd = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
+export const usd = (n: number) => { const r = Math.round(n); return `${r < 0 ? "−" : ""}$${Math.abs(r).toLocaleString("en-US")}`; };
 
 /** Aggregated, name-free findings — the only autopsy detail that is ever sent to the model. */
 export function aggregateFindings(a: Autopsy): string[] {

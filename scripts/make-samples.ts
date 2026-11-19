@@ -33,7 +33,7 @@ for (const s of SAMPLES) {
     let rules: Rules = s.truthRules;
     if (defect?.cause === "accelerator_mode") rules = { ...rules, acceleratorMode: rules.acceleratorMode === "marginal" ? "retroactive" : "marginal" };
     if (defect?.cause === "clawback_missed") rules = { ...rules, clawbackDays: null };
-    if (defect?.cause === "split_double_credit") rules = { ...rules, splitRule: "full_credit_each" };
+    if (defect?.cause === "split_double_credit") rules = { ...rules, splitRule: "full_credit_each", spiffSplit: "full_each" };
     if (defect?.cause === "cap_ignored") rules = { ...rules, capPct: null };
     const { credited, payout } = payoutFor(rep.rep, rep.quota, ledger, rules);
     const sheetPayout = defect?.cause === "hardcoded_override" ? payout + (defect.overrideDelta ?? 0) : payout;

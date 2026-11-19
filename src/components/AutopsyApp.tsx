@@ -218,6 +218,13 @@ function Confirm({ ex, rules, map, pw, edits, onRule, onMap, onRun, onBack, erro
               rules.spiffs.map((s, i) => (
                 <div key={i} className="text-sm num">{usd(s.amount)} per deal ≥ {usd(s.minDealAmount)}</div>
               ))}
+            {rules.spiffs.length > 0 && (
+              <select value={rules.spiffSplit} className="mt-1 rounded border border-line px-2 py-1 text-xs"
+                onChange={(e) => onRule("spiffSplit", { ...rules, spiffSplit: e.target.value as Rules["spiffSplit"] })}>
+                <option value="pro_rata">On split deals: paid by split share</option>
+                <option value="full_each">On split deals: full SPIFF to each rep</option>
+              </select>
+            )}
           </RuleRow>
         </div>
 
