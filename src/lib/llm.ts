@@ -104,7 +104,6 @@ export async function extractPlan(planText: string, headers: Record<string, stri
   const msg = await client.messages.create({
     model: MODEL,
     max_tokens: 3000,
-    temperature: 0,
     system: SYSTEM_EXTRACT,
     tools: [EXTRACT_TOOL],
     tool_choice: { type: "tool", name: "record_plan" },
@@ -149,7 +148,6 @@ export async function draftOpener(input: OpenerInput) {
   const msg = await client.messages.create({
     model: MODEL,
     max_tokens: 400,
-    temperature: 0.4,
     system: SYSTEM_OPENER,
     messages: [{ role: "user", content: `AUTOPSY FINDINGS (aggregated; no rep-level data):\n${JSON.stringify(input, null, 1)}` }],
   });
