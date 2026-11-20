@@ -4,7 +4,7 @@
 
 > A concept built by **Gaurav Dabas** for Everstage's Growth team as part of a Growth Engineer application. **This is not an Everstage product.** It uses no Everstage logo or data. All sample workbooks are synthetic and labelled *illustrative*.
 
-Live: _(added at deploy)_ · Video: _(added after recording)_
+Live: https://comp-sheet-autopsy.vercel.app · Video: submitted with the application
 
 ![report](docs/report.png)
 
