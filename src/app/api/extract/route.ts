@@ -16,10 +16,11 @@ export async function POST(req: Request) {
     return NextResponse.json(ex);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    console.error("extract failed:", (e as { status?: number }).status, msg.slice(0, 500));
     await logEvent({ type: "extraction_err", sessionId: body.sessionId, props: { error: msg.slice(0, 200) } });
     // Fallback is ONLY allowed for the bundled sample, and is labelled as cached in the UI.
     const cached = body.sampleFile ? cachedSampleExtraction(body.sampleFile) : null;
-    if (cached) return NextResponse.json({ ...cached, fallbackReason: msg === "NO_API_KEY" ? "No API key configured" : "Live model call failed" });
+    if (cached) return NextResponse.json({ ...cached, fallbackReason: msg === "NO_API_KEY" ? "No API key configured" : `Live model call failed: ${msg.slice(0, 160)}` });
     return NextResponse.json({ error: msg === "NO_API_KEY" ? "The live model isn't configured on this deployment." : "The model couldn't read this plan. Try again, or check the Plan tab." }, { status: 502 });
   }
 }

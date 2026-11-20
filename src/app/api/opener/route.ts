@@ -13,6 +13,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ...out, source: "live" });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    console.error("opener failed:", (e as { status?: number }).status, msg.slice(0, 500));
     await logEvent({ type: "opener_err", sessionId: body.sessionId, props: { error: msg.slice(0, 200) } });
     return NextResponse.json({ error: "Draft unavailable — the BDR writes this one by hand.", source: "none" }, { status: 502 });
   }
