@@ -3,18 +3,26 @@ import { useEffect, useMemo, useState } from "react";
 
 type Ev = { type: string; sessionId?: string; props?: Record<string, unknown>; ts: string };
 const FUNNEL: [string, string][] = [
-  ["autopsy_started", "Autopsy started"], ["parsed_ok", "Workbook parsed"], ["extraction_ok", "Plan read (live model)"],
+  ["autopsy_started", "Autopsy started"], ["parsed_ok", "Workbook parsed"], ["extraction_ok_client", "Plan read (live model)"],
   ["report_viewed", "Report viewed"], ["lead_submitted", "Lead submitted"], ["lead_qualified", "Qualified → BDR"],
 ];
 
 export default function Metrics() {
   const [data, setData] = useState<{ store: string; events: Ev[] } | null>(null);
-  useEffect(() => { fetch("/api/events", { cache: "no-store" }).then((r) => r.json()).then(setData); }, []);
+  useEffect(() => {
+    fetch("/api/events", { cache: "no-store" }).then((r) => r.json()).then((d: { store: string; events: Ev[] }) => {
+      // Server-side model events (latency/tokens) + this browser's funnel events.
+      let local: Ev[] = [];
+      try { local = JSON.parse(localStorage.getItem("csa_events") ?? "[]"); } catch {}
+      if (d.store.startsWith("supabase")) setData(d);
+      else setData({ store: "memory + this browser (demo)", events: [...local, ...d.events.filter((e) => e.type.startsWith("extraction") || e.type.startsWith("opener_d") || e.type === "opener_err")] });
+    });
+  }, []);
   const ev = data?.events ?? [];
   const count = (t: string) => ev.filter((e) => e.type === t).length;
   const m = useMemo(() => {
-    const lat = ev.filter((e) => e.type === "extraction_ok").map((e) => Number(e.props?.latencyMs ?? 0)).sort((a, b) => a - b);
-    const tok = ev.filter((e) => e.type === "extraction_ok").map((e) => Number(e.props?.inputTokens ?? 0) + Number(e.props?.outputTokens ?? 0));
+    const lat = ev.filter((e) => e.type === "extraction_ok_client").map((e) => Number(e.props?.latencyMs ?? 0)).sort((a, b) => a - b);
+    const tok = ev.filter((e) => e.type === "extraction_ok_client").map((e) => Number(e.props?.inputTokens ?? 0) + Number(e.props?.outputTokens ?? 0));
     const reviewed = count("opener_approved") + count("opener_edited");
     const reasons = new Map<string, number>();
     ev.filter((e) => e.type === "opener_edited").forEach((e) => { const r = String(e.props?.reason ?? "?"); reasons.set(r, (reasons.get(r) ?? 0) + 1); });
@@ -24,7 +32,7 @@ export default function Metrics() {
     return {
       p50: lat.length ? lat[Math.floor(lat.length / 2)] : null,
       tokens: tok.length ? Math.round(tok.reduce((a, b) => a + b, 0) / tok.length) : null,
-      extractFail: count("extraction_ok") + count("extraction_err") ? count("extraction_err") / (count("extraction_ok") + count("extraction_err")) : null,
+      extractFail: count("extraction_ok_client") + count("extraction_cached") ? count("extraction_cached") / (count("extraction_ok_client") + count("extraction_cached")) : null,
       editRate: reviewed ? count("opener_edited") / reviewed : null,
       avgEditRatio: ratios.length ? ratios.reduce((a, b) => a + b, 0) / ratios.length : null,
       reviewed, reasons: [...reasons.entries()].sort((a, b) => b[1] - a[1]), ruleEdits: [...ruleEdits.entries()],
@@ -39,7 +47,7 @@ export default function Metrics() {
       <div>
         <p className="text-xs uppercase tracking-[0.2em] text-muted">Built into the product · real events only, no seeded data</p>
         <h1 className="font-serif text-4xl font-semibold mt-1">Is it working?</h1>
-        <p className="text-sm text-muted mt-1">Store: <span className="font-mono">{data?.store ?? "…"}</span>{data?.store === "memory" && " (resets when the server instance restarts — Supabase in production)"}</p>
+        <p className="text-sm text-muted mt-1">Store: <span className="font-mono">{data?.store ?? "…"}</span>{data?.store?.startsWith("memory") && " — demo store; Supabase table in production"}</p>
       </div>
 
       <div className="grid md:grid-cols-[1.3fr_1fr] gap-6">

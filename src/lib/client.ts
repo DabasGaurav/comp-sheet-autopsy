@@ -25,6 +25,12 @@ export function sessionId() {
 
 export function track(type: string, props: Record<string, unknown> = {}) {
   const body = JSON.stringify({ type, sessionId: sessionId(), props });
+  // mirror to this browser so /metrics works even when the server store is a per-instance memory store
+  try {
+    const local = JSON.parse(localStorage.getItem("csa_events") ?? "[]");
+    local.unshift({ type, sessionId: sessionId(), props, ts: new Date().toISOString() });
+    localStorage.setItem("csa_events", JSON.stringify(local.slice(0, 2000)));
+  } catch {}
   try {
     fetch("/api/events", { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true });
   } catch {}

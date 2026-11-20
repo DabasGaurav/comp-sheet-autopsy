@@ -40,6 +40,7 @@ export default function AutopsyApp() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Extraction failed");
+      track(data.source === "live" ? "extraction_ok_client" : "extraction_cached", { latencyMs: data.latencyMs ?? null, inputTokens: data.inputTokens ?? null, outputTokens: data.outputTokens ?? null, model: data.model ?? null });
       setEx(data); setRules(data.rules); setMap(data.columnMap); setStage("confirm");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Extraction failed"); setStage("upload");
